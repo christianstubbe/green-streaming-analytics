@@ -1,0 +1,123 @@
+\label{sec:approach}
+
+\section{Solution Approach}
+%The approach that was taken for this project was...
+\begin{comment}
+Given task
+- build a video player able to change playback settings (bitrate, ...) 
+- collect CMCD data during playback of videos
+- collect energy consumption data from playback device via Netio smart power plugs
+- combine and analyse data in Grafana dashboards
+
+first approach
+- get familiar with the technology \& develop architecture (workshop 1)
+- 
+
+changes during development process
+- simplified architecture 
+
+
+- Grafana dashboard (Max)
+    different diagramms: .... TODO
+- everythin in docker (Max)
+    
+\end{comment}
+\begin{comment}
+problems we had:
+- requesting netio data: concurrency -> from setTimeout to node-scheduling ( aspect: get the resting power consumption of the device when no video is played to be able to normalize the data)
+- store the video data -> TUBCloud to example video files on dash website (no storing in the git repo, no downloading for the user, easy access)
+- creating the session id in the frontend -> not best practice (theoretically, the id can be assigned twice)
+- exposing the netio device to the internet
+- baseline energy consumption of devices
+\end{comment}
+
+%\subsection{Overall Architecture and running tests}
+Our application is structured around five main components, each playing a crucial role in the data collection and analysis process.
+
+\subsection{Component Overview}
+
+\subsubsection{Netio Device} At the foundation of our data collection process is the Netio power socket, a device capable of measuring the energy consumption of connected electronic devices. 
+It collects detailed energy usage data and makes this information accessible via an endpoint on the local network. 
+By interfacing directly with our application, the Netio device provides power consumption metrics essential for our analysis.
+
+\subsubsection{Media Player Frontend} The media player frontend is where the interaction with the user takes place. 
+Through the media player interface, users can input Netio device data, control video playback, and conclude measurement sessions, making it a critical component of our system.
+
+\subsubsection{Measurement Server} Serving as the application's main backend, the measurement server has multiple interfaces connecting it to the other components. 
+It is responsible for receiving Client Media Common Data (CMCD) from the frontend, which contains valuable information about the video playback. 
+Additionally, it requests energy consumption data from the Netio device and stores all collected data in the database. 
+This centralized server is in managing data flow and ensuring the integrity and reliability of the data collected.
+
+\subsubsection{Database} The database is the repository for all relevant data collected during the measurement sessions. 
+It stores energy consumption data, CMCD, and session data that is crucial for analysis. 
+This structured data storage allows for efficient data retrieval and analysis, serving as the foundation for generating insights into energy consumption patterns on the dashboards.
+
+\subsubsection{Grafana Dashboards} To visualize and analyze the collected data, we employ Grafana dashboards. 
+These dashboards are designed to aggregate the data from our database, presenting it in an intuitive and informative manner. 
+By correlating power consumption data with CMCD, the dashboards provide insights into the relationship between video playback characteristics and energy usage. 
+This visual analysis tool is useful for identifying patterns and drawing conclusions from the collected data.
+
+In the subsequent sections, we will offer detailed insights into the frontend, backend, and Grafana dashboards, providing a deeper understanding of the internal processes. A diagramm showing the components, processes and data flows can be found in the appendix \ref{fig:project_architecture}.
+
+\subsection{Frontend: Media Player }
+Our web application's frontend is engineered to deliver an efficient user experience, enabling testing of video playback scenarios and collection of CMCD. 
+This entails a sequence of user interactions and system responses. 
+The frontend was developed using Vue.js with Typescript and Vuetify as the framework. It provides an engaging platform for users to execute their measurements, which are outlined through a series of steps:
+
+Users launch the application by navigating to its URL in the web browser installed on their Smart TV, laptop or PC. 
+Upon accessing the frontend, users are prompted to enter the configuration data for the Netio power socket, including the IP address and password. 
+This information is crucial for establishing a communication link between the application and the Netio device. 
+With the Netio settings configured, the application generates a unique session UUID. 
+This identifier is crucial for correlating the collected power data with the specific session and later the CMCD. 
+The session UUID is subsequently sent to the backend, marking the beginning of the data recording phase (a session). 
+Users can then start the video playback. 
+During playback, Client Media Common Data with the session ID which is stored in a cookie is sent to a designated endpoint in the backend. 
+This data includes key metrics relevant to the playback performance. Throughout the testing session, users retain control over the playback. They have the option to pause the video, resume playback, or switch to a different video, depending on the testing requirements.
+
+The session can be concluded in two ways. Users can manually end the session by clicking the "End Session" button within the application. 
+Alternatively, the session will end after a set period of inactivity.
+
+For video playback, we have opted to host our video files on Google Cloud for reliable and scalable access to the video content. The videos were encoded locally before being uploaded, allowing users to choose the playback quality and ensuring adaptive bitrate streaming (ABR).
+
+\subsection{Backend: Measurement Server and Database}
+The backend of our web application is a critical component designed to manage sessions, collect the energy consumption data, and ensure seamless communication between the frontend and the database. 
+Our tech stack comprises a Node.js server with Express and a PostgreSQL database that includes tables for "sessions", "cmcd", and "netio". This setup provides a robust and efficient platform for data management and retrieval.
+
+The interaction between the frontend and the backend begins when the frontend submits the first request containing the session ID and the Netio device configuration data. 
+This POST request triggers the creation of a new session entry in the database, effectively initializing the test session.
+Subsequently, the frontend starts sending Client Media Common Data to the backend when playing a video, targeting the designated endpoint. 
+This CMCD, which includes information about the video playback on the client, is stored in the "cmcd" table, along with the corresponding session ID. 
+This structured approach ensures that all collected data is accurately associated with its respective session, enabling detailed analysis in the Grafana dashboards.
+
+To efficiently collect Netio power consumption data, we employ node-scheduler to execute periodic tasks.
+This scheduler triggers a function every 10 seconds, tasked with identifying active sessions by querying the "sessions" table. 
+Upon identifying an active session, the function retrieves the Netio device configuration using the authentication data stored alongside the session information. 
+The collected Netio data is then stored in the "netio" table, associated with the respective session ID.
+This method allows for the simultaneous monitoring of multiple Netio devices without encountering issues related to parallel processing on the Node.js server.
+
+In addition to collecting Netio data, another critical function of our backend involves monitoring session activity. 
+Using node-scheduler, the system checks every minute for sessions that have not received CMCD for the past 30 minutes. 
+Such sessions are flagged as terminated in the database, indicating that data collection for those sessions has concluded. 
+This automated process ensures that sessions are accurately tracked and managed, allowing for the efficient termination of inactive sessions and the conservation of resources.
+
+\subsection{Grafana Dashboards}
+For the display and visual analysis of the gathered data, two separate dashboards were developed for the open-source visualization web application Grafana \footnote{Grafana Labs: https://grafana.com/}.
+
+\subsubsection{Overview dashboard}
+The first dashboard provides concise information about the existing sessions. Besides the total number of currently active sessions, a table lists all existing sessions along with descriptive attributes such as the session creation time, the IP address and the serial number of the associated Netio device, and the time the last CMCD entry was received. It serves as the entrypoint of the dashboard ensemble and is used to identify the sessions that should be inspected further.
+
+\subsubsection{Session-specific dashboard}
+The second dashboard is a session-specific dashboard that displays detailed data from a selected session. A filter on the very top of the dashboard can be used to select a session. In the upper part of the dashboard, a table displays the metadata attributes for the selected session.
+
+The next part of the dashboard focuses on energy consumption data. A line graph shows the baseline load, the total load, and the total load minus the baseload load captured during the selected session in watts over time. The baseline load is calculated in an attempt to then distinguish the playback device’s energy consumption while idling from its energy consumption during video playback. To achieve this, the arithmetic mean of the energy consumption of the playback device before the first CMCD entry was created is considered the baseline load. The creation time of the first CMCD entry is used as a proxy for the video playback start as this marks the point in time when the first video segment was requested by the playback device.
+
+The aforementioned energy consumption visualization is combined with different CMCD metrics in the following parts of the dashboard. By default, three line graphs show the energy consumption data together with the measured throughput between the client and the content server, the video’s bitrate, and the buffer length, respectively. Another graph shows the energy consumption data along with a user-selected CMCD metric. This allows the user to analyze the captured data in a flexible manner. (possible selections: bitrate, buffer length, duration, deadline, measured throughput, playback rate, requested maximum throughput, top bitrate.
+
+\subsection{Dockerization}
+Dockerization played a pivotal role in ensuring the fast, reliable, and platform-independent shipment of our project components. By creating Docker container configurations for each component, we were able to encapsulate the environment in which our application runs. This encapsulation guarantees that our application works uniformly across any platform supporting Docker. All necessary components were integrated within one Docker compose file \footnote{The Docker compose file of our project: \url{https://github.com/florian-baumann/awt_ws2324/blob/main/src/docker-compose.yml}}. This approach not only simplified the development process, but would also serve as a ready-to-use method to operationalize the application. The utilization of environment variables, which are loaded during startup, enhanced our application's configurability and security. By externalizing configuration details to environment variables, we made our application adaptable to different environments without requiring changes to the codebase. This Dockerization strategy has been instrumental in ensuring that our application remains agile, portable, and easy to manage across diverse development and production landscapes.
+
+\subsection{Running measurements}
+Before initiating the measurement process, users must ensure they have the appropriate hardware and setup conditions. This involves mainly:
+\subsubsection{Hardware Requirements} The measurement process is designed to be conducted on a Smart TV, a Laptop or PC. These devices should be capable of running a modern web browser, which is essential for accessing the Vue.js-based frontend of our application and playing videos.
+\subsubsection{Power Connection through Netio Power Socket} The playback device must be connected to an electrical outlet via a Netio power socket. This setup is crucial for monitoring and recording the power consumption data accurately during the video playback.
+\subsubsection{Optimizing the Measurement Environment} To minimize any potential interference with the power data collection, users are advised to terminate any unnecessary programs running on the device. The only application that should remain active is the web browser that runs our application.\\

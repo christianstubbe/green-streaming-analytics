@@ -1,0 +1,94 @@
+{
+    "Agent": {
+        "Model": "PowerDIN 4PZ",
+        "Version": "2.5.4",
+        "JSONVer": "2.3",
+        "DeviceName": "myNetio_10",
+        "VendorID": 0,
+        "OemID": 0,
+        "MAC": "24:A4:2C:33:25:E1",
+        "SerialNumber": "24A42C3325E1",
+        "Uptime": 110637,
+        "Time": "2017-11-03T13:53:38+00:00",
+        "NumOutputs": 4,
+        "NumInputs": 2
+    },
+    "GlobalMeasure": {
+        "Voltage": 235.8,
+        "Frequency": 49.9,
+        "TotalCurrent": 20,
+        "OverallPowerFactor": 0.22,
+        "Phase": -42.90,
+        "TotalLoad": 1,
+        "TotalEnergy": 965,
+        "EnergyStart": "2017-06-23T16:47:53+01:00"
+    },
+    "Outputs": [
+        {
+            "ID": 1,
+            "Name": "output_1",
+            "State": 0,
+            "Action": 6,
+            "Delay": 5000,
+            "Current": 0,
+            "PowerFactor": 0,
+            "Phase": 0.00,
+            "Load": 0,
+            "Energy": 192,
+            "ReverseEnergy": 0
+        },
+        {
+            "ID": 2,
+            "Name": "output_2",
+            "State": 0,
+            "Action": 6,
+            "Delay": 5000,
+            "Current": 0,
+            "PowerFactor": 0,
+            "Phase": 0.00,
+            "Load": 0,
+            "Energy": 80,
+            "ReverseEnergy": 0
+        },
+        {
+            "ID": 3,
+            "Name": "output_3",
+            "State": 0,
+            "Action": 6,
+            "Delay": 5000,
+            "Current": 0,
+            "PowerFactor": 0,
+            "Phase": 0.00,
+            "Load": 0,
+            "Energy": 196,
+            "ReverseEnergy": 0
+        },
+        {
+            "ID": 4,
+            "Name": "output_4",
+            "State": 1,
+            "Action": 6,
+            "Delay": 5000,
+            "Current": 20,
+            "PowerFactor": 0.22,
+            "Phase": -42.90,
+            "Load": 1,
+            "Energy": 495,
+            "ReverseEnergy": 0
+        }
+    ],
+    "Inputs": [
+        {
+            "ID": 1,
+            "Name": "Input 1",
+            "State": 0,
+            "S0Counter": 7
+        },
+        {
+            "ID": 2,
+            "Name": "Input 2",
+            "State": 0,
+            "S0Counter": 0
+        }
+    ]
+}

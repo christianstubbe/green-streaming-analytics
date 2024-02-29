@@ -1,0 +1,15 @@
+\label{sec:abstract}
+
+
+
+\begin{abstract}
+
+The widespread adoption of streaming services in our modern digital landscape has raised concerns about their environmental impact, particularly in terms of electricity consumption. As streaming continues to grow as a primary source of entertainment, it becomes imperative to address these environmental challenges. Our project aimed to tackle this issue by developing a content based measurement system that tracks electricity consumption per content played on streaming platforms. By providing streaming providers with insights into their energy usage, our system empowers them to better manage their environmental footprint and work towards sustainable streaming practices. It also allows researchers to experiment with the content and acquire deeper insights into the factors that play a major impact in energy consumption in the context of streaming. 
+
+To achieve this objective, we implemented a web application capable of pulling data from a designated API (NETIO) and integrating it with CMCD. This combined dataset is then stored in a Postgres database and visualized using Grafana dashboards, allowing for comprehensive analysis of energy consumption patterns. Our system operates by establishing user sessions and collecting data during video playback, with CMCD providing valuable insights into content consumption behavior. Additionally, we utilize node-schedulers to periodically request data from NETIO devices, capturing baseline power consumption of playback devices.
+
+The system also includes functionality for starting and stopping sessions, enabling users to initiate and terminate data collection as needed. Active sessions are monitored, and inactive sessions are automatically terminated after a specified period, ensuring efficient resource utilization.
+
+The Grafana dashboard serves as a central hub for data visualization, aggregating session, CMCD, and energy consumption data. This comprehensive visualization platform empowers streaming providers to make informed decisions regarding energy consumption and environmental impact mitigation strategies. The Grafana dashboard was also implemented in a manner that allows the user to seamlessly alter the graphs and switch between multiple CMCD metrics along with the energy consumption depending on the interest of the user. In the concluding section of this report, limitations and further possible future improvements of the system are discussed. 
+
+\end{abstract}

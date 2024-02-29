@@ -1,0 +1,59 @@
+% File Structure
+    \begin{figure}[ht]
+        \dirtree{%
+        .1 green-streaming-analytics.
+            .2 assets.
+                .3 (...).
+            .2 src.
+                .3 grafana.
+                    .4 data.
+                        .5 (...).
+                    .4 details-dashboard.json.
+                    .4 docker-compose.yml.
+                    .4 overview-dashboard.json.
+                .3 measurement-db.
+                    .4 init.
+                        .5 init.sql.
+                    .4 .gitignore.
+                    .4 Dockerfile.
+                    .4 sample-data-database-dump.sql.
+                .3 measurement-service.
+                    .4 config.
+                        .5 config.js.
+                    .4 controllers.
+                        .5 cmcdController.js.
+                        .5 sessionController.js.
+                    .4 exampleData.
+                        .5 netio.json.
+                    .4 models.
+                        .5 Cmcd.js.
+                        .5 Netio.js.
+                        .5 Session.js.
+                        .5 index.js.
+                    .4 services.
+                        .5 (...).
+                    .4 Dockerfile.
+                    .4 index.js.
+                    .4 package-lock.json.
+                    .4 package.json.
+                .3 media-player.
+                    .4 src.
+                        .5 assets.
+                        .5 components.
+                        .5 router.
+                        .5 views.
+                        .5 App.vue.
+                        .5 main.ts.
+                    .4 Dockerfile.
+                    .4 index.html.
+                    .4 package-lock.json.
+                    .4 package.json.
+                .3 .env.template.
+                .3 docker-compose.yml.
+            .2 .gitignore.
+            .2 LICENSE.
+            .2 README.md.
+            }
+        \caption{File Structure}
+        \label{fig:files}
+\end{figure}

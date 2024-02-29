@@ -1,0 +1,60 @@
+\documentclass[conference]{IEEEtran}
+
+% -------------------------------------
+% Packages
+% -------------------------------------
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{dirtree}
+\usepackage{comment}
+\usepackage{acronym}
+\usepackage{makecell} % used for cell creation in tables
+
+%Darstellung von URL
+\usepackage{url}
+\urlstyle{same}
+\usepackage{hyperref}
+% -------------------------------------
+
+% Set cell alignment default to vertial top and horizontal left
+\renewcommand{\cellalign}{tl}
+\renewcommand{\theadalign}{tl}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+
+\begin{document}
+
+\input{content/Title}
+
+
+\maketitle
+% To add page numbers:
+\thispagestyle{plain}
+\pagestyle{plain}
+
+
+\input{content/Abstract}
+\input{content/Introduction}
+\input{content/Related_Work}
+\input{content/approach}
+\input{content/evaluation}
+\input{content/Conclusion}
+\input{content/Acknowledgements}
+
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\cleardoublepage
+% \addcontentsline{toc}{section}{Appendices}
+\onecolumn
+\appendix
+\input{content/appendix}
+
+\end{document}

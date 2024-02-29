@@ -1,0 +1,2325 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Active since (seconds)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 133
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Inactive since (seconds)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "terminatedOn"
+          }
+        ]
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e0f526db-dd35-47ba-b16f-5114128d9c4d"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH numberOfCmcdEntriesBySid as (\n  select\n    count(id) as \"cmcdEntries\",\n    max(\"createdAt\") as \"latestCmcdEntry\",\n    \"sid\"\n    FROM \"Cmcds\"\n    group by \"sid\"\n),\ncombined as (\n  SELECT\n    \"id\" as \"ID\",\n    \"deviceSerialNumber\" as \"NETIO Serial Number\",\n    \"deviceIP\" as \"NETIO Device IP\",\n    case\n      when \"terminatedOn\" is null then EXTRACT(EPOCH FROM (NOW() - \"createdAt\"))\n      else null\n    end as \"Active since (seconds)\",\n    case\n      when \"terminatedOn\" is not null then EXTRACT(EPOCH FROM (NOW() - \"terminatedOn\"))\n      else null\n    end as \"Inactive since (seconds)\",\n    \"createdAt\" as \"Created at\",\n    \"terminatedOn\" as \"Terminated on\",\n    \"cmcdEntries\" as \"Number of CMCD entries\",\n    \"latestCmcdEntry\" as \"Latest CMCD entry\"\n  FROM \"Sessions\" LEFT JOIN numberOfCmcdEntriesBySid ON \"Sessions\".\"id\" = numberOfCmcdEntriesBySid.\"sid\"\n  WHERE \"Sessions\".\"id\" = '$sessionID'\n  ORDER BY \"createdAt\" DESC\n)\nselect * from combined",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"sessionId\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"terminatedOn\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"deviceSerialNumber\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "\"Sessions\""
+        }
+      ],
+      "title": "Session metadata",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 17,
+      "panels": [],
+      "title": "Detailed energy consumption",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 0,
+        "y": 5
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 60,
+          "valueSize": 80
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "builder",
+          "format": "table",
+          "rawSql": "SELECT AVG(total_load) FROM \"Netios\" WHERE session_id = '$sessionID' ",
+          "refId": "AVG_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9abbb8a8-89ab-4cde-b012-318d83a58149",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "b9a88bbb-89ab-4cde-b012-318d8397762c",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        }
+      ],
+      "title": "Average consumption (W)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Watts",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_load"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_minus_baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 17,
+        "x": 7,
+        "y": 5
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \"createdAt\", total_load, session_id\nFROM \"Netios\"\nWHERE session_id = '$sessionID'\nAND \"createdAt\" between '${__from:date}' and '${__to:date}'",
+          "refId": "ENERGY_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "session_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9a8b9b89-cdef-4012-b456-718d837894bd",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a8a999b-89ab-4cde-b012-318d8362b549",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload,\n\"Netios\".\"createdAt\"\nFROM \"Netios\"\nJOIN AVERAGE_LOAD ON 1=1",
+          "refId": "BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH ENERGY_CONSUMPTION AS (\n  SELECT \"createdAt\", total_load, session_id\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" between '${__from:date}' and '${__to:date}'\n),\nFIRST_CMCD_ENTRY AS (\n    SELECT \n      MIN(\"createdAt\") AS MAX_DATE\n    FROM \"Cmcds\"\n    WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT\n  \"createdAt\",\n  total_load - (SELECT load FROM AVERAGE_LOAD) as load_minus_baseload\nFROM ENERGY_CONSUMPTION",
+          "refId": "ENERGY_CONSUMPTION_MINUS_BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Power consumption (W)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 0,
+        "y": 8
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 60,
+          "valueSize": 80
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload\nFROM AVERAGE_LOAD",
+          "refId": "AVG_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9abbb8a8-89ab-4cde-b012-318d83a58149",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "b9a88bbb-89ab-4cde-b012-318d8397762c",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        }
+      ],
+      "title": "Baseline consumption (W)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 0,
+        "y": 11
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 60,
+          "valueSize": 80
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n)\nSELECT AVG(total_load) FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" > (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)",
+          "refId": "AVG_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "name": "AVG",
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9abbb8a8-89ab-4cde-b012-318d83a58149",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "b9a88bbb-89ab-4cde-b012-318d8397762c",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        }
+      ],
+      "title": "Average consumption (W) during playback",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Key CMCD metrics and energy consumption",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_load"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_minus_baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 15
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sid, \"createdAt\", mtp as \"Measured throughput\" FROM \"Cmcds\" WHERE (type = 'video' AND sid = '${sessionID}' AND \"createdAt\" between '${__from:date}' and '${__to:date}') ",
+          "refId": "CMCD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "sid",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "br",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "b9ab8ab9-89ab-4cde-b012-318c6e8c7fcd",
+                  "properties": {
+                    "field": "type",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "video"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                },
+                {
+                  "id": "899b98ab-89ab-4cde-b012-318d46937cd4",
+                  "properties": {
+                    "field": "sid",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "${sessionID}"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a99aaab-89ab-4cde-b012-318c6e814842",
+              "type": "group"
+            },
+            "whereString": "(type = 'video' AND sid = '${sessionID}')"
+          },
+          "table": "\"Cmcds\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'",
+          "refId": "ENERGY_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "session_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9a8b9b89-cdef-4012-b456-718d837894bd",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a8a999b-89ab-4cde-b012-318d8362b549",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload,\n\"Netios\".\"createdAt\"\nFROM \"Netios\"\nJOIN AVERAGE_LOAD ON 1=1",
+          "refId": "BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH ENERGY_CONSUMPTION AS (\n  SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'\n),\nFIRST_CMCD_ENTRY AS (\n    SELECT \n      MIN(\"createdAt\") AS MAX_DATE\n    FROM \"Cmcds\"\n    WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT\n  \"createdAt\",\n  total_load - (SELECT load FROM AVERAGE_LOAD) as load_minus_baseload\nFROM ENERGY_CONSUMPTION",
+          "refId": "ENERGY_CONSUMPTION_MINUS_BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Measured throughput (kbps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_load"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_minus_baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 15
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sid, \"createdAt\", br as \"Bitrate\" FROM \"Cmcds\" WHERE (type = 'video' AND sid = '${sessionID}' AND \"createdAt\" between '${__from:date}' and '${__to:date}') ",
+          "refId": "CMCD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "sid",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "br",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "b9ab8ab9-89ab-4cde-b012-318c6e8c7fcd",
+                  "properties": {
+                    "field": "type",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "video"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                },
+                {
+                  "id": "899b98ab-89ab-4cde-b012-318d46937cd4",
+                  "properties": {
+                    "field": "sid",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "${sessionID}"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a99aaab-89ab-4cde-b012-318c6e814842",
+              "type": "group"
+            },
+            "whereString": "(type = 'video' AND sid = '${sessionID}')"
+          },
+          "table": "\"Cmcds\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'",
+          "refId": "ENERGY_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "session_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9a8b9b89-cdef-4012-b456-718d837894bd",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a8a999b-89ab-4cde-b012-318d8362b549",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload,\n\"Netios\".\"createdAt\"\nFROM \"Netios\"\nJOIN AVERAGE_LOAD ON 1=1",
+          "refId": "BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH ENERGY_CONSUMPTION AS (\n  SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'\n),\nFIRST_CMCD_ENTRY AS (\n    SELECT \n      MIN(\"createdAt\") AS MAX_DATE\n    FROM \"Cmcds\"\n    WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT\n  \"createdAt\",\n  total_load - (SELECT load FROM AVERAGE_LOAD) as load_minus_baseload\nFROM ENERGY_CONSUMPTION",
+          "refId": "ENERGY_CONSUMPTION_MINUS_BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Bitrate (kbps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_load"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_minus_baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 15
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sid, \"createdAt\", bl as \"Buffer length\" FROM \"Cmcds\" WHERE (type = 'video' AND sid = '${sessionID}' AND \"createdAt\" between '${__from:date}' and '${__to:date}')",
+          "refId": "CMCD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "sid",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "bl",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "b9ab8ab9-89ab-4cde-b012-318c6e8c7fcd",
+                  "properties": {
+                    "field": "type",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "video"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                },
+                {
+                  "id": "899b98ab-89ab-4cde-b012-318d46937cd4",
+                  "properties": {
+                    "field": "sid",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "${sessionID}"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a99aaab-89ab-4cde-b012-318c6e814842",
+              "type": "group"
+            },
+            "whereString": "(type = 'video' AND sid = '${sessionID}')"
+          },
+          "table": "\"Cmcds\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'",
+          "refId": "ENERGY_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "session_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9a8b9b89-cdef-4012-b456-718d837894bd",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a8a999b-89ab-4cde-b012-318d8362b549",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload,\n\"Netios\".\"createdAt\"\nFROM \"Netios\"\nJOIN AVERAGE_LOAD ON 1=1",
+          "refId": "BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH ENERGY_CONSUMPTION AS (\n  SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'\n),\nFIRST_CMCD_ENTRY AS (\n    SELECT \n      MIN(\"createdAt\") AS MAX_DATE\n    FROM \"Cmcds\"\n    WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT\n  \"createdAt\",\n  total_load - (SELECT load FROM AVERAGE_LOAD) as load_minus_baseload\nFROM ENERGY_CONSUMPTION",
+          "refId": "ENERGY_CONSUMPTION_MINUS_BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Buffer length (ms)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Selectable CMCD metric and energy consumption",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_load"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_minus_baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseload"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sid, \"createdAt\", ${cmcd_metric} FROM \"Cmcds\" WHERE (type = 'video' AND sid = '${sessionID}' AND \"createdAt\" between '${__from:date}' and '${__to:date}') ",
+          "refId": "CMCD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "sid",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "br",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "b9ab8ab9-89ab-4cde-b012-318c6e8c7fcd",
+                  "properties": {
+                    "field": "type",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "video"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                },
+                {
+                  "id": "899b98ab-89ab-4cde-b012-318d46937cd4",
+                  "properties": {
+                    "field": "sid",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "${sessionID}"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a99aaab-89ab-4cde-b012-318c6e814842",
+              "type": "group"
+            },
+            "whereString": "(type = 'video' AND sid = '${sessionID}')"
+          },
+          "table": "\"Cmcds\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'",
+          "refId": "ENERGY_CONSUMPTION",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "\"createdAt\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "total_load",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "session_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "9a8b9b89-cdef-4012-b456-718d837894bd",
+                  "properties": {
+                    "field": "session_id",
+                    "fieldSrc": "field",
+                    "operator": "equal",
+                    "value": [
+                      "$sessionID"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "text"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "9a8a999b-89ab-4cde-b012-318d8362b549",
+              "type": "group"
+            },
+            "whereString": "session_id = '$sessionID'"
+          },
+          "table": "\"Netios\""
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH FIRST_CMCD_ENTRY AS (\n  SELECT \n    MIN(\"createdAt\") AS MAX_DATE\n  FROM \"Cmcds\"\n  WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT AVERAGE_LOAD.load AS baseload,\n\"Netios\".\"createdAt\"\nFROM \"Netios\"\nJOIN AVERAGE_LOAD ON 1=1",
+          "refId": "BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH ENERGY_CONSUMPTION AS (\n  SELECT \"createdAt\", total_load, session_id FROM \"Netios\" WHERE session_id = '$sessionID' AND \"createdAt\" between '${__from:date}' and '${__to:date}'\n),\nFIRST_CMCD_ENTRY AS (\n    SELECT \n      MIN(\"createdAt\") AS MAX_DATE\n    FROM \"Cmcds\"\n    WHERE sid = '$sessionID'\n),\nAVERAGE_LOAD AS (\n  SELECT \n    CASE\n      WHEN AVG(total_load) IS NULL THEN 100\n      ELSE AVG(total_load)\n    END AS load\n  FROM \"Netios\"\n  WHERE session_id = '$sessionID'\n  AND \"createdAt\" < (SELECT MAX_DATE FROM FIRST_CMCD_ENTRY)\n)\nSELECT\n  \"createdAt\",\n  total_load - (SELECT load FROM AVERAGE_LOAD) as load_minus_baseload\nFROM ENERGY_CONSUMPTION",
+          "refId": "ENERGY_CONSUMPTION_MINUS_BASELOAD",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "${cmcd_metric} against power consumption",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "1723a5e6-b7eb-48fc-9979-1c4346d7232b",
+          "value": "1723a5e6-b7eb-48fc-9979-1c4346d7232b"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "d1ad027d-96d1-4297-971e-b889a2a71c88"
+        },
+        "definition": "select distinct \"Sessions\".\"id\" from \"Sessions\";",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Session",
+        "multi": false,
+        "name": "sessionID",
+        "options": [],
+        "query": "select distinct \"Sessions\".\"id\" from \"Sessions\";",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "br",
+          "value": "br"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "CMCD Metric",
+        "multi": false,
+        "name": "cmcd_metric",
+        "options": [
+          {
+            "selected": true,
+            "text": "br",
+            "value": "br"
+          },
+          {
+            "selected": false,
+            "text": "bl",
+            "value": "bl"
+          },
+          {
+            "selected": false,
+            "text": "bs",
+            "value": "bs"
+          },
+          {
+            "selected": false,
+            "text": "d",
+            "value": "d"
+          },
+          {
+            "selected": false,
+            "text": "dl",
+            "value": "dl"
+          },
+          {
+            "selected": false,
+            "text": "mtp",
+            "value": "mtp"
+          },
+          {
+            "selected": false,
+            "text": "pr",
+            "value": "pr"
+          },
+          {
+            "selected": false,
+            "text": "rtp",
+            "value": "rtp"
+          },
+          {
+            "selected": false,
+            "text": "su",
+            "value": "su"
+          },
+          {
+            "selected": false,
+            "text": "tb",
+            "value": "tb"
+          }
+        ],
+        "query": "br,bl,bs,d,dl,mtp,pr,rtp,su,tb",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Green Streaming Analytics - Per-session view",
+  "uid": "d2615051-1edf-4c95-ad42-4847e0090ef9",
+  "version": 25,
+  "weekStart": ""
+}

@@ -1,0 +1,39 @@
+{
+    "videos": [
+        {
+            "title": "gray_4k_25fps_05mbps_h264",
+            "id": "gray_4k_25fps_05mbps_h264",
+            "url": "https://storage.googleapis.com/gray_4k_25fps_05mbps_h264/dash.mpd"
+        },
+        {
+            "title": "lumafilter_1920x1080_h264_25_5000",
+            "id": "lumafilter_1920x1080_h264_25_5000",
+            "url": "https://storage.googleapis.com/lumafilter_1920x1080_h264_25_5000/dash.mpd"
+        },
+        {
+            "title": "lumafilter_3840x2160_h265_60_15000",
+            "id": "lumafilter_3840x2160_h265_60_15000",
+            "url": "https://storage.googleapis.com/lumafilter_3840x2160_h265_60_15000/dash.mpd"
+        },
+        {
+            "title": "random_hd_25fps_10mbps_h264",
+            "id": "random_hd_25fps_10mbps_h264",
+            "url": "https://storage.googleapis.com/random_hd_25fps_10mbps_h264/dash.mpd"
+        },
+        {
+            "title": "random_hd_25fps_10mbps_h265",
+            "id": "random_hd_25fps_10mbps_h265",
+            "url": "https://storage.googleapis.com/random_hd_25fps_10mbps_h265/dash.mpd"
+        },
+        {
+            "title": "random_hd_25fps_50mbps_h264",
+            "id": "random_hd_25fps_50mbps_h264",
+            "url": "https://storage.googleapis.com/random_hd_25fps_50mbps_h264/dash.mpd"
+        },
+        {
+            "title": "random_hd_25fps_50mbps_h265",
+            "id": "random_hd_25fps_50mbps_h265",
+            "url": "https://storage.googleapis.com/random_hd_25fps_50mbps_h265/dash.mpd"
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+\label{sec:evaluation}
+\section{Evaluation}
+
+The following section will present and discuss the results of the preliminary data collection. Furthermore it will critically evaluate the architectural decisions that were made during the design of the testing environment and the chosen tech stack. 
+
+% -------------------------------------
+\subsection{Preliminary Data Collection}
+% -------------------------------------
+As part of this project a preliminary data collection was conducted. For this preliminary data collection four hardware devices were used. The first device, a local machine, hosted the measurement server, the media player and the Grafana dashboards. The second device, a desktop PC, accessed the media player provided by the first device to playback videos. This desktop PC ran Windows 11 with a Ryzen 7 3700X CPU, an AMD RX5700XT GPU, and 32GB of RAM. The third device was an external monitor connected to the desktop PC. The external monitor was an Acer Nitro VG240YU with an WQHD resolution of 1440p. The fourth device was the Netio PowerCable 24A42C38E7EA. 
+
+\input{assets/tab-testing-hardware}
+
+The Netio device captured both the energy consumption of the desktop PC and the external monitor. The external monitor was connected to the desktop PC via a DisplayPort cable. The energy consumption of the local machine running the measurement server, media player and Grafana dashboards was not measured as it is not relevant to the research question. Prior to the preliminary data collection, all background tasks that were not required were terminated on the desktop PC. The video was playing in full-screen. The display brightness was set to 100\% on the external monitor. 
+
+As described in section \ref{sec:approach}) separate sessions for each video were created. Each section included 60s base load measurements before the first video segment was loaded in order to simplify the attribution of additional energy consumption during video playback to the research question. After this 60s base load period, the actual playback was started by using the “Start Session” button in the media player. 
+
+The results of the data collection are part of the GitHub repository in the Grafana dashboards. The main task in this project is not to collect data, but to provide an adequate testing environment for further data collection. Hence, this evaluation will discuss the testing environment and not the results of the preliminary data collected itself in detail. 
+
+% -------------------------------------
+\subsection{Improvement of the preliminary data collection}
+% -------------------------------------
+The preliminary data collection can be improved by the following suggestions to increase the quality of the data collected: 
+
+\begin{itemize}
+  \item Mitigate the impact of background processes on the desktop PC
+  \item Measure energy consumption of external monitor and desktop PC separately 
+  \item Measure energy consumption of a variety of differences devices 
+  \item Standardize the testing procedure
+\end{itemize}
+
+Healthy Windows systems will have a multitude of processes running in parallel. Each of theses processes influences the energy consumption. An improved data collection process should aim to minimize the impact of these processes on the energy consumption of the desktop PC. Furthermore, the energy consumption of the external monitor and the desktop PC should be measured separately. This allows to separate changes in the stream that are attributed to e.g. network traffic and CPU usage from changes in video brightness. Also, the energy consumption should be measured on a variety of different device categories and different devices within the same device category. As 60.3\% of households in Germany in 2022 had an internal-enabled television set (smart TV) \cite{medienanstalten2020}, the device category SmartTV should be measured next to desktop PCs. This would allow to gain more insights on the research question. Within one device category, measurements should be performed on multiple devices in order to mitigate any device-specific fluctuations in energy consumption that cannot be mitigated by reducing the number of processes running in parallel. As a last item, the testing procedure could be standardized in a document specifying the 60s base load period, the video in which videos are played and any interactions executed by the researcher on the media player e.g. adjusting video quality or sound. 
+
+These changes in the data collection would lead to more fine-grained energy measurements and allow a more sophisticated analysis. Ultimately in a perfect testing environment each segment request should be related to a spike in energy consumption and can be deconstructed into energy consumption caused by the network traffic, the monitor and the playback of the video itself. 
+
+% -------------------------------------
+\subsection{Evaluation of available features}
+% -------------------------------------
+This section will critically discuss the user flow in the testing environment. 
+
+As described in section \ref{sec:approach} the media player creates a new session ID as soon as the user enters the Netio device configuration. This leads to the risk of ID collision, which could lead to confusion when analyzing the data in the Grafana dashboards. The session ID is generated with UUIDv4 as a random value of 122 bits leading to $2^{122}$ possible values. This translates into a 50\% chance of generating a single collision when 1 billion v4 UUIDs are generated for 85 years. Due to these odds, the generation of the session ID in the media player is unlikely to have any impact on the quality of the data collection. 
+
+In its current state the testing environment only supports dash.js. Depending on the research question, playing videos with HLS might be relevant as well. This would require only minor changes to the media player. The measurement server is  already player-agnostic to support an HLS player. 
+
+The testing environment is designed to be used by multiple Netio devices in both a single network or across multiple networks. In a multi-network scenario the Netio device needs to be exposed to the public internet in order to communicate with the measurement server. As the current setup supports a variety of data collection scenarios, it is possible to fulfill the suggested measurements across a variety of differences devices in device categories, as described in the previous subsection. 
+
+% -------------------------------------
+\subsection{Evaluation of the technology stack}
+% -------------------------------------
+This section critically evaluates the use of Node.js, Vue.js, PostgreSQL, and Docker as a combined technology stack for the testing environment. A detailed overview of the usage of these technologies in the project was presented in section \ref{sec:approach}. All languages, frameworks and tools in the technology stack are well-established. JavaScript is the the most popular programming language in the world \cite{jetbrains2023} and Vue.js is with 32\% of JavaScript developers using it, the second most-used JavaScript framework after React.js. Node.js is being used on more than 6.3 million websites, including popular sites such as Cloudflare, GitHub and Spotify \cite{Radixweb2023}. This makes Node.js also likely a solid choice for the foreseeable future. PostgreSQL has become the most admired and desired database in the 2023 Stack Overflow survey \cite{StackOverflow2023}. However, MySQL reaches under extreme-write workloads a slight advantage over PostgreSQL \cite{Bytebase2023}. But this scale is not relevant for this project. Furthermore PostgreSQL is released under a very liberal Open Source license comparable to the MIT license, while MySQL is owned by Oracle \cite{Bytebase2023}. In the 2023 Stack Overflow Docker was ranked as the most-used developer tool \cite{StackOverflow2023}. Due to these usage statistics, the combined use of Node.js, Vue.js, PostgreSQL, and Docker presents a robust technology stack for the testing environment. 
